@@ -10,7 +10,7 @@ import java.util.Date
 
 @Service
 class JwtService(
-    @Value("JWT_SECRET_BASE64") private val jwtSecret: String
+    @Value("\${jwt.secret}") private val jwtSecret: String
 ) {
 
 

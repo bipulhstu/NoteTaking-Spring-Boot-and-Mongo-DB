@@ -4,6 +4,7 @@ import com.bipul.note_taking_app.controllers.NoteController.NoteResponse
 import com.bipul.note_taking_app.database.model.Note
 import com.bipul.note_taking_app.database.repository.NoteRepository
 import org.bson.types.ObjectId
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -47,6 +48,8 @@ class NoteController(
     fun save(
        @RequestBody body: NoteRequest
     ): NoteResponse{
+        val ownerId = SecurityContextHolder.getContext().authentication.principal as String
+
        val note =  noteRepository.save(
             Note(
                 id = body.id ?.let { ObjectId(it) } ?: ObjectId.get(),
@@ -54,7 +57,7 @@ class NoteController(
                 content = body.content,
                 color = body.color,
                 createdAt = Instant.now(),
-                ownerId = ObjectId()
+                ownerId = ObjectId(ownerId)
             )
 
        )
@@ -72,8 +75,10 @@ class NoteController(
 
     @GetMapping
     fun findByOwnerId(
-        @RequestParam(required = true) ownerId: String
+        //@RequestParam(required = true) ownerId: String
     ): List<NoteResponse>{
+        //get ownerId from security
+        val ownerId = SecurityContextHolder.getContext().authentication.principal as String
         return noteRepository.findByOwnerId(ObjectId(ownerId)).map {
             /*NoteResponse(
                 id = it.id.toString(),
@@ -88,7 +93,13 @@ class NoteController(
 
     @DeleteMapping(path = ["/{id}"])
     fun deleteById(@PathVariable id: String){
-        noteRepository.deleteById(ObjectId(id))
+        val note = noteRepository.findById(ObjectId(id)).orElseThrow {
+            IllegalArgumentException("Note not found.")
+        }
+        val ownerId = SecurityContextHolder.getContext().authentication.principal as String
+        if(note.ownerId.toHexString() == ownerId){
+            noteRepository.deleteById(ObjectId(id))
+        }
     }
 }
 
