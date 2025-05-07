@@ -16,8 +16,8 @@ class JwtService(
 
     private val secretKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(jwtSecret))
 
-    private val accessTokenValidityMs = 15L * 60L * 1000L //15 Minutes
-    private val refreshTokenValidityMs = 30L * 24L * 30L * 1000L // 30 Days
+     val accessTokenValidityMs = 15L * 60L * 1000L //15 Minutes
+     val refreshTokenValidityMs = 30L * 24L * 30L * 1000L // 30 Days
 
     private fun generateToken(
         userId: String,
