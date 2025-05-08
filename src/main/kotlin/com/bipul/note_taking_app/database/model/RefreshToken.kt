@@ -8,7 +8,7 @@ import java.time.Instant
 @Document("refresh_tokens")
 data class RefreshToken(
     val userId: ObjectId,
-    @Indexed(expireAfter = "Os")
+    @Indexed(expireAfter = "1s")
     val expiresAt: Instant,
     val hashedToken: String,
     val createdAt: Instant = Instant.now()

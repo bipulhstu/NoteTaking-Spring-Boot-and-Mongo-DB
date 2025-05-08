@@ -1,6 +1,9 @@
 package com.bipul.note_taking_app.controllers
 
 import com.bipul.note_taking_app.security.AuthService
+import jakarta.validation.Valid
+import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.Pattern
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -14,7 +17,12 @@ class AuthController(
 ) {
 
     data class AuthRequest(
+        @field:Email(message = "Invalid Email Address.")
         val email: String,
+        @field:Pattern(
+            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{9,}$",
+            message = "Password must be at least 9 characters long and contain at least one digit, one uppercase and lowercase character."
+        )
         val password: String
     )
 
@@ -25,7 +33,7 @@ class AuthController(
     //register
     @PostMapping("/register")
     fun register(
-        @RequestBody body: AuthRequest
+        @Valid @RequestBody body: AuthRequest
     ){
         authService.register(body.email, body.password)
     }
